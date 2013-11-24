@@ -1,0 +1,11 @@
+function [category] = ldaDecision(toCategorize, mu, sigma, prior)
+
+    diff = 
+    if (diff > 0)
+        category = 1;
+    elseif (diff == 0)
+        category = round(rand);
+    else
+        category = 2;
+    end
+end
