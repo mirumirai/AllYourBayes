@@ -40,7 +40,7 @@ sliderCallbacks = {'disp(''Mu 1 moved'')';
     'disp(''Mu 2 moved'')';
     'disp(''Sigma 2 moved'')';
     'disp(''Prior 1 moved'')'};
-for ii = 1:6
+for ii = 1:5
     Panel.position = startPos{ii};
     Panel.title = titleStrings{ii};
     Slider.callback = sliderCallbacks{ii};

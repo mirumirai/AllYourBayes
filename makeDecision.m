@@ -14,10 +14,17 @@ function [choice, params] = makeDecision(data,type,mu,sigma,prior)
 %   choice - either 1 or 2, corresponding to distribution 1 or 2
 %   params - 2x2 matrix; first row has estimated mus, second row has 
 %           estimated sigmas
-% MLE first
+% Possible types include:
+% 'mle' - maximum likelihood estimation
+% 'map' - maximum a posteriori estimation
+% 'lda' - linear discriminant analysis
+
+% Compute the likelihoods and estimate the Gaussian distribution of
+% the input data
+[like1,muEst(1),sigmaEst(1)] = mleGaussian(data,mu(1),sigma(1));
+[like2,muEst(2),sigmaEst(2)] = mleGaussian(data,mu(2),sigma(2));
+
 if strcmpi(type,'mle')
-    [like1,muEst(1),sigmaEst(1)] = mleGaussian(data,mu(1),sigma(1));
-    [like2,muEst(2),sigmaEst(2)] = mleGaussian(data,mu(2),sigma(2));
     % Make the decision based on which likelihood is higher
     if like1>like2
         choice = 1;
@@ -31,8 +38,6 @@ if strcmpi(type,'mle')
         end
     end
 elseif strcmpi(type,'map')
-    [like1,muEst(1),sigmaEst(1)] = mleGaussian(data,mu(1),sigma(1));
-    [like2,muEst(2),sigmaEst(2)] = mleGaussian(data,mu(2),sigma(2));
     % Make the decision based on which likelihood*prior is higher
     if like1*prior(1) > like2*prior(2)
         choice = 1;
@@ -45,8 +50,17 @@ elseif strcmpi(type,'map')
             choice = 2;
         end
     end
+elseif strcmpi(type,'lda')
+    % LDA assumes both distributions have the same variance
+    if (sigma(1) ~= sigma(2))
+        disp('Attempting to do LDA on distributions with different variances.');
+        disp('This is probably not ending well.');
+    end
+    choice = ldaDecision(data, mu, sigma(1), prior);
 else
     disp('Estimation type does not exist');
 end
+
 params = [muEst;sigmaEst];
+
 end
