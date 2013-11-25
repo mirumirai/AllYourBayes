@@ -1,8 +1,19 @@
 function [choice, params] = makeDecision(data,type,mu,sigma,prior)
 % Chooses the more likely of two distributions
-% Possible types include:
-% 'mle' - maximum likelihood estimation
-% 'map' - maximum a posteriori estimation
+% Inputs:
+%   data - a scalar or vector of input signals
+%	types - Estimation type. Possible types include:
+%       'mle' - maximum likelihood estimation
+%       'map' - maximum a posteriori estimation
+%   mu - 2-element vector, with element 1 corresponding to the mean of the
+%       first distribution and element 2 corresponding to the mean of the
+%       second distribution
+%   sigma - 2-element vector, like mu, except standard deviations
+%   prior - 2-element vector, like mu, except prior probabilities
+% Returns choice and params
+%   choice - either 1 or 2, corresponding to distribution 1 or 2
+%   params - 2x2 matrix; first row has estimated mus, second row has 
+%           estimated sigmas
 % MLE first
 if strcmpi(type,'mle')
     [like1,muEst(1),sigmaEst(1)] = mleGaussian(data,mu(1),sigma(1));

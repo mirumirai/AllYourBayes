@@ -1,5 +1,0 @@
-function param = mleGaussian(data)
-% Calculates the maximum likelihood estimate for Gaussian data
-% Data can be a scalar or a vec
-    for i = 1:length(data
-end
