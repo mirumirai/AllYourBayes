@@ -2,19 +2,29 @@ function startGUI
 % STARTGUI Select a data set from the pop-up menu, then
 % click one of the plot-type push buttons. Clicking the button
 % plots the selected data in the axes.
+
+% Set parameter defaults
+type = 'mle';
+mu1 = 50;   sigma1 = 50; 
+mu2 = 50;   sigma2 = 50;
+prior1 = 50; % Percent
+
+whos % see variables
 %  Create and then hide the GUI as it is being constructed.
-hFig = figure('Position',[100,100,800,600]);
-%'Visible','off',
+hFig = figure('Visible','off','Position',[100,100,800,600]);
+
 % Construct the components.
-hRun    = uicontrol('Style','pushbutton',...
+hRun = uicontrol('Style','pushbutton',...
     'String','Run Simulation',...
     'Units','normalized','Pos',[.75,.025,0.17,.05],...
     'Callback',{@runbutton_Callback});
-hMu1Text  = uicontrol('Style','text','String','Choose Method',...
-    'Units','normalized','Pos',[.75,.95,.17,.025]);
+
+hMethodText = uicontrol('Style','text','String','Choose Method',...
+    'Units','normalized','Pos',[.76,.95,.15,.025]);
+
 hpopup = uicontrol('Style','popupmenu',...
     'String',{'MLE','MAP','LDA'},...
-    'Units','normalized','Pos',[.75,.9,.17,.05],...
+    'Units','normalized','Pos',[.75,.89,.17,.05],...
     'Callback',{@popup_menu_Callback});
 
 % Create the panel for setting means, standard deviations, and priors
@@ -40,11 +50,37 @@ sliderCallbacks = {'disp(''Mu 1 moved'')';
     'disp(''Mu 2 moved'')';
     'disp(''Sigma 2 moved'')';
     'disp(''Prior 1 moved'')'};
-for ii = 1:5
-    Panel.position = startPos{ii};
-    Panel.title = titleStrings{ii};
-    Slider.callback = sliderCallbacks{ii};
+for i = 1:5
+    Panel.position = startPos{i};
+    Panel.title = titleStrings{i};
+    Slider.callback = sliderCallbacks{i};
     sliderPanel(hPanel,Panel,Slider,EditOpts,LabelOpts,numFormat);
 end
+
+% Move the GUI to the center of the screen.
+movegui(hFig,'center')
+
+% Make the GUI visible.
 set(hFig,'Visible','on')
+
+end
+
+function popup_menu_Callback(source,eventdata)
+% Determine the selected data set.
+str = get(source, 'String');
+val = get(source, 'Value');
+% Set current data to the selected data set.
+switch str{val};
+    case 'MLE' % User selects Peaks.
+        type = 'mle'
+    case 'MAP' % User selects Membrane.
+        type = 'map'
+    case 'LDA' % User selects Sinc.
+        type = 'lda'
+end
+end
+
+function runbutton_Callback(source,eventdata)
+% Run platform demo
+platformDemo()
 end
