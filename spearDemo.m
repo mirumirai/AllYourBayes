@@ -3,7 +3,7 @@ function [] = spearDemo(spears, smiles, perceived)
     % Setup the timesteps / canvas / initial plot
     timesteps = min(length(spears), ...
         min(length(smiles), length(perceived)));
-
+    
     figure('Renderer', 'zbuffer');
     hold on;
     
@@ -31,78 +31,100 @@ function [] = spearDemo(spears, smiles, perceived)
     % Draw initial spears
     for x=(1:width)
         % Real positions of incoming spears in red.
-        hh1(x) = line([x-1, x], spearLow, 'Color', 'r', 'LineWidth', 2, ...
+        hh1(x) = line([x-1, x], [0 0], 'Color', 'r', 'LineWidth', 2, ...
             'Marker', '<', 'MarkerFaceColor', 'r');
         
         % Perceived positions of the incoming spears in green.
-        hh1(width + x) = line([x-1, x], [0 0], 'LineStyle', ':', 'Color', 'g', ...
-            'LineWidth', 2, 'Marker', '<', 'MarkerFaceColor', 'g', ...
-            'MarkerEdgeColor', 'g');
+        %hh1(width + x) = line([x-1, x], [0 0], 'LineStyle', ':', 'Color', 'g', ...
+        %    'LineWidth', 2, 'Marker', '<', 'MarkerFaceColor', 'g', ...
+        %    'MarkerEdgeColor', 'g');
     end
+    
+    % Initial handle for smile.
+    hh1(2*width+1) = line([0 0], [0 0]);
     
     % Only draw on the figure from this function!
     function [] = redrawAll(time)
-        drawSmiley();
-        drawSpears();
+        drawSmiley(time);
+        drawSpears(time);
         
         % Get frame as an image
         F(time) = getframe(gcf);
     end
 
     % Draw the smiley (or dead smiley) face
-    function [] = drawSmiley() 
+    function [] = drawSmiley(time) 
+        % Decide to draw the smile in the top or bottom position.
+        if (time - width > 0 && smiles(time-width) == 1)
+            smileOffset = 1;
+        else
+            smileOffset = 0;
+        end
+        
+        % Delete the old smiley before we draw a new one.
+        delete(hh1(2*width+1));
+        
+        % Draw the new smiley!
         if (~dead) 
             hh1(2*width+1) = image([smileyRight, smileyLeft], ...
-                [smileyTop, smileyBottom], smileyFace);
+                [smileyTop + smileOffset, smileyBottom + smileOffset], ...
+                smileyFace);
         else
-            deadOffset = 0.05;
+            deadOffset = 0.05; % Dead pic slightly different size; this fixes.
             hh1(2*width+1) = image([smileyRight+deadOffset, ...
                 smileyLeft-deadOffset], ...
-                [smileyTop+deadOffset, smileyBottom-deadOffset], ...
+                [smileyTop+deadOffset+smileOffset, ...
+                smileyBottom-deadOffset+smileOffset], ...
                 deadFace);
         end
     end
 
     % Draw the incoming spears.
-    function [] = drawSpears()
+    function [] = drawSpears(time)
         for i=(1:width)
-            curSpear = spears(time);
-            seenHeight = perceived(time);
-            
             if (i < width) % Move old platforms left
             
                 % Actual spear positions.
                 set(hh1(i), 'YData', get(hh1(i+1), 'YData'));
                 
                 % Perceived spear positions.
-                set(hh1(width+i), 'YData', get(hh1(width+i+1), 'YData'));
+                % set(hh1(width+i), 'YData', get(hh1(width+i+1), 'YData'));
             
             else % New platform for this timestep
-                
-                % Actual spear position
-                if (curSpear == 1)
-                    set(hh1(i), 'YData', spearHigh);
-                elseif (curSpear == 0)
-                    set(hh1(i), 'YData', spearLow);
+                if (time <= timesteps)
+                    curSpear = spears(time);
+                    seenHeight = perceived(time);
+
+                    % Actual spear position
+                    if (curSpear == 1)
+                        set(hh1(i), 'YData', spearHigh);
+                    elseif (curSpear == 0)
+                        set(hh1(i), 'YData', spearLow);
+                    else
+                        disp('Invalid spear value.  Must be 0 or 1.  Oops!');
+                    end
+
+                    % Perceived spear position.
+                    % set(hh1(width+i), 'YData', [seenHeight seenHeight]); 
                 else
-                    disp('Invalid spear value.  Must be 0 or 1.  Oops!');
+                    set(hh1(i), 'YData', [0 0]);
+                    % set(hh1(width+i), 'YData', [0 0]);
                 end
-                
-                % Perceived spear position.
-                set(hh1(width+i), 'YData', [seenHeight seenHeight]);                
             end
         end
     end
 
     % Set dead to true iff the smiley died on this time step. -- OUCH!!!
     function [] = checkDead(time)
-        if (spears(time) == smiles(time))
-            dead = true;
+        if (time - width > 0)
+            if (spears(time-width) == smiles(time-width))
+                dead = true;
+            end
         end
     end
 
     % Timing loop (Every iteration is one time step.)
-    for time=(1:timesteps)
+    for time=(1:timesteps+width)
         checkDead(time);
         redrawAll(time);
         if (dead)
