@@ -1,0 +1,19 @@
+Welcome to Smiley Spear Avoidance Training!
+
+You are a smiley face.  You can't see very well.
+Deadly spears are approaching. Your goal is to survive.
+
+Actual locations of the approaching spears are in red.  Every red spear
+is in one of two categories: high or low.
+The locations these spears appear to you (on account of your poor vision)
+are in green.
+
+Based on your sensory perception (green spears), you must classify the
+location of the actual spears (red spears).  Fortunately, you can choose
+your brain's method of interpreting sensory stimuli. 
+
+Choose your brain's classifier wisely: MLE, MAP, or LDA.  Each has its strengths
+and weaknesses.
+
+
+
