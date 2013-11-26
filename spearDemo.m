@@ -23,6 +23,7 @@ function [] = spearDemo(spears, smiles, perceived)
     dead = false;
     smileyRight = 0.9; smileyLeft = 0.1; 
     smileyTop = 0.75; smileyBottom = 0.25;
+    smileOffset = 0;
     
     % Assign the possible spear heights
     spearLow = [0.5, 0.5];
@@ -35,9 +36,9 @@ function [] = spearDemo(spears, smiles, perceived)
             'Marker', '<', 'MarkerFaceColor', 'r');
         
         % Perceived positions of the incoming spears in green.
-        %hh1(width + x) = line([x-1, x], [0 0], 'LineStyle', ':', 'Color', 'g', ...
-        %    'LineWidth', 2, 'Marker', '<', 'MarkerFaceColor', 'g', ...
-        %    'MarkerEdgeColor', 'g');
+        hh1(width + x) = line([x-1, x], [0 0], 'LineStyle', ':', 'Color', 'g', ...
+            'LineWidth', 2, 'Marker', '<', 'MarkerFaceColor', 'g', ...
+            'MarkerEdgeColor', 'g');
     end
     
     % Initial handle for smile.
@@ -45,8 +46,8 @@ function [] = spearDemo(spears, smiles, perceived)
     
     % Only draw on the figure from this function!
     function [] = redrawAll(time)
-        drawSmiley(time);
         drawSpears(time);
+        drawSmiley(time);
         
         % Get frame as an image
         F(time) = getframe(gcf);
@@ -54,23 +55,32 @@ function [] = spearDemo(spears, smiles, perceived)
 
     % Draw the smiley (or dead smiley) face
     function [] = drawSmiley(time) 
-        % Decide to draw the smile in the top or bottom position.
-        if (time - width > 0 && smiles(time-width) == 1)
-            smileOffset = 1;
-        else
-            smileOffset = 0;
-        end
         
         % Delete the old smiley before we draw a new one.
         delete(hh1(2*width+1));
         
         % Draw the new smiley!
         if (~dead) 
+            % Decide to draw the smile in the top or bottom position.
+            timeIdx = time-(width-1);
+            if (timeIdx > 0 && timeIdx <= timesteps)
+                if (smiles(time-(width-1)) == 2)
+                    % Offset to put smile in upper position (? - buggy)
+                    smileOffset = 1;
+                else
+                    % Offset to put smile in lower position (? - buggy)
+                    smileOffset = 0;
+                end
+            end
+            
+            % Draw the alive smiley :)
             hh1(2*width+1) = image([smileyRight, smileyLeft], ...
                 [smileyTop + smileOffset, smileyBottom + smileOffset], ...
                 smileyFace);
         else
             deadOffset = 0.05; % Dead pic slightly different size; this fixes.
+            
+            % Draw the dead smiley :(
             hh1(2*width+1) = image([smileyRight+deadOffset, ...
                 smileyLeft-deadOffset], ...
                 [smileyTop+deadOffset+smileOffset, ...
@@ -88,7 +98,7 @@ function [] = spearDemo(spears, smiles, perceived)
                 set(hh1(i), 'YData', get(hh1(i+1), 'YData'));
                 
                 % Perceived spear positions.
-                % set(hh1(width+i), 'YData', get(hh1(width+i+1), 'YData'));
+                set(hh1(width+i), 'YData', get(hh1(width+i+1), 'YData'));
             
             else % New platform for this timestep
                 if (time <= timesteps)
@@ -96,19 +106,19 @@ function [] = spearDemo(spears, smiles, perceived)
                     seenHeight = perceived(time);
 
                     % Actual spear position
-                    if (curSpear == 1)
+                    if (curSpear == 2)
                         set(hh1(i), 'YData', spearHigh);
-                    elseif (curSpear == 0)
+                    elseif (curSpear == 1)
                         set(hh1(i), 'YData', spearLow);
                     else
                         disp('Invalid spear value.  Must be 0 or 1.  Oops!');
                     end
 
                     % Perceived spear position.
-                    % set(hh1(width+i), 'YData', [seenHeight seenHeight]); 
+                    set(hh1(width+i), 'YData', [seenHeight seenHeight]); 
                 else
                     set(hh1(i), 'YData', [0 0]);
-                    % set(hh1(width+i), 'YData', [0 0]);
+                    set(hh1(width+i), 'YData', [0 0]);
                 end
             end
         end
@@ -132,6 +142,7 @@ function [] = spearDemo(spears, smiles, perceived)
         end
     end
 
+    delete(gcf);
     figure();
     movie(gcf,F, 1, 1); 
 end
