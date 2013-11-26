@@ -33,9 +33,10 @@ Panel.title = 'Parameter Tool';
 Panel.bordertype = 'none';
 Panel.titleposition = 'centertop';
 Panel.fontweight = 'bold';  
-Slider.min = 0;
-Slider.max = 100;
-Slider.value = 50;
+Slider.min = -1;
+Slider.max = 4;
+Slider.value = 1.5;
+[mu1,sigma1,mu2,sigma2,prior1] = deal(Slider.value);
 EditOpts = {'fontsize',10};
 LabelOpts = {'fontsize',8,'fontweight','b'};
 numFormat = '%0.0f';
@@ -45,16 +46,16 @@ startPos = {[0.05 0.05 0.9 0.18];
     [0.05 0.41 0.9 0.18];
     [0.05 0.59 0.9 0.18]
     [0.05 0.77 0.9 0.18]};
-sliderCallbacks = {'disp(''Mu 1 moved'')';
-    'disp(''Sigma 1 moved'')';
-    'disp(''Mu 2 moved'')';
-    'disp(''Sigma 2 moved'')';
-    'disp(''Prior 1 moved'')'};
+sliderCallbacks = {{@updatePrior1};
+    {@updateSigma2};
+    {@updateMu2};
+    {@updateSigma1};
+    {@updateMu1}};
 for i = 1:5
     Panel.position = startPos{i};
     Panel.title = titleStrings{i};
     Slider.callback = sliderCallbacks{i};
-    sliderPanel(hPanel,Panel,Slider,EditOpts,LabelOpts,numFormat);
+    [hSlider(i),~,~] = sliderPanel(hPanel,Panel,Slider,EditOpts,LabelOpts,numFormat);
 end
 
 % Move the GUI to the center of the screen.
@@ -88,6 +89,28 @@ set(hFig,'Visible','on')
         [frames] = spearDemo(spears, smiles, perceived,figPos);
         movie(hFig,frames,1,2,[0 figPos(4)*.33 0 0]);
     end
+    % Update slider values
+    function updateMu1(source,eventdata)
+        newval = get(source,'value');
+        mu1 = newval
+    end
+    function updateSigma1(source,eventdata)
+        newval = get(source,'value');
+        sigma1 = newval
+    end
+    function updateMu2(source,eventdata)
+        newval = get(source,'value');
+        mu2 = newval
+    end
+    function updateSigma2(source,eventdata)
+        newval = get(source,'value');
+        sigma2 = newval
+    end
+    function updatePrior1(source,eventdata)
+        newval = get(source,'value');
+        prior1 = newval
+    end
+
 
 end
 
