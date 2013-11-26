@@ -1,4 +1,4 @@
-function [] = spearDemo(spears, smiles, perceived)
+function [frames] = spearDemo(spears, smiles, perceived)
 
     % Setup the timesteps / canvas / initial plot
     timesteps = min(length(spears), ...
@@ -142,7 +142,6 @@ function [] = spearDemo(spears, smiles, perceived)
         end
     end
 
-    delete(gcf);
-    figure();
-    movie(gcf,F, 1, 1); 
+    delete(gcf); 
+    frames = F;
 end
