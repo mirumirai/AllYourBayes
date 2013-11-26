@@ -63,24 +63,31 @@ movegui(hFig,'center')
 % Make the GUI visible.
 set(hFig,'Visible','on')
 
+%% Nested Callback Functions Section
+    function popup_menu_Callback(source,eventdata)
+        % Determine the selected data set.
+        str = get(source, 'String');
+        val = get(source, 'Value');
+        % Set current data to the selected data set.
+        switch str{val};
+            case 'MLE' % User selects Peaks.
+                type = 'mle'
+            case 'MAP' % User selects Membrane.
+                type = 'map'
+            case 'LDA' % User selects Sinc.
+                type = 'lda'
+        end
+    end
+
+    function runbutton_Callback(source,eventdata)
+        spears = [1 2 1 2 1 2];
+        smiles = [2 1 2 1 2 2];
+        perceived = [1.1 2.1 1.5 1.9 0.9 2];
+        % Run spear demo
+        figPos = get(hFig,'Position');
+        [frames] = spearDemo(spears, smiles, perceived,figPos);
+        movie(hFig,frames,1,2,[0 figPos(4)*.33 0 0]);
+    end
+
 end
 
-function popup_menu_Callback(source,eventdata)
-% Determine the selected data set.
-str = get(source, 'String');
-val = get(source, 'Value');
-% Set current data to the selected data set.
-switch str{val};
-    case 'MLE' % User selects Peaks.
-        type = 'mle'
-    case 'MAP' % User selects Membrane.
-        type = 'map'
-    case 'LDA' % User selects Sinc.
-        type = 'lda'
-end
-end
-
-function runbutton_Callback(source,eventdata)
-% Run platform demo
-platformDemo()
-end

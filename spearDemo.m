@@ -1,13 +1,13 @@
-function [frames] = spearDemo(spears, smiles, perceived)
+function [frames] = spearDemo(spears, smiles, perceived, figPos)
 
     % Setup the timesteps / canvas / initial plot
     timesteps = min(length(spears), ...
         min(length(smiles), length(perceived)));
-    
-    figure('Renderer', 'zbuffer');
+    newPos = [0 0 figPos(3)*.67 figPos(4)*.67];
+    figure('Renderer', 'zbuffer','Position',newPos);
     hold on;
     
-    height = 2;
+    height = 3;
     width = 5;
     axis([0 width 0 height]);
     
@@ -22,12 +22,12 @@ function [frames] = spearDemo(spears, smiles, perceived)
     % Set the smiley's initial position / condition (alive)
     dead = false;
     smileyRight = 0.9; smileyLeft = 0.1; 
-    smileyTop = 0.75; smileyBottom = 0.25;
+    smileyTop = 1.25; smileyBottom = 0.75;
     smileOffset = 0;
     
     % Assign the possible spear heights
-    spearLow = [0.5, 0.5];
-    spearHigh = [1.5, 1.5];
+    spearLow = [1, 1];
+    spearHigh = [2, 2];
     
     % Draw initial spears
     for x=(1:width)
