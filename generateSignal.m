@@ -10,8 +10,8 @@ function signal = generateSignal(spears,type)
     
     % Signal generation distribution parameters. Basically determines the
     % "blurriness" of his eyesight.
-    mu1 = 1; sigma1 = 0.5;
-    mu2 = 2; sigma2 = 0.5;
+    mu1 = 1; sigma1 = 0.3;
+    mu2 = 2; sigma2 = 0.3;
    
     signal = zeros(1,length(spears));
     

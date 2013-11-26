@@ -9,7 +9,6 @@ mu1 = 50;   sigma1 = 50;
 mu2 = 50;   sigma2 = 50;
 prior1 = 50; % Percent
 
-whos % see variables
 %  Create and then hide the GUI as it is being constructed.
 hFig = figure('Visible','off','Position',[100,100,800,600]);
 
@@ -26,6 +25,13 @@ hpopup = uicontrol('Style','popupmenu',...
     'String',{'MLE','MAP','LDA'},...
     'Units','normalized','Pos',[.75,.89,.17,.05],...
     'Callback',{@popup_menu_Callback});
+description = 'Description';
+hDescription = uicontrol('Style','text','String',description,...
+    'Units','normalized','Pos',[.05,.2,.57,.13]);
+status = {'Underlying Prior: ','Underlying Mu: ','Underlying Sigma: '};
+hStatus = uicontrol('Style','text','String',status,...
+    'Units','normalized','Pos',[.05,.05,.57,.13],...
+    'Callback',{@updateStatus});
 
 % Create the panel for setting means, standard deviations, and priors
 hPanel = uipanel(gcf,'title','Parameters','units','normalized','pos',[0.67 0.1 0.33 0.7]);
@@ -39,7 +45,7 @@ Slider.value = 1.5;
 [mu1,sigma1,mu2,sigma2,prior1] = deal(Slider.value);
 EditOpts = {'fontsize',10};
 LabelOpts = {'fontsize',8,'fontweight','b'};
-numFormat = '%0.0f';
+numFormat = '%0.2f';
 titleStrings = {'Prior 1 (%)','Sigma 2', 'Mu 2', 'Sigma 1', 'Mu 1'};
 startPos = {[0.05 0.05 0.9 0.18];
     [0.05 0.23 0.9 0.18];
@@ -72,45 +78,58 @@ set(hFig,'Visible','on')
         % Set current data to the selected data set.
         switch str{val};
             case 'MLE' % User selects Peaks.
-                type = 'mle'
+                type = 'mle';
             case 'MAP' % User selects Membrane.
-                type = 'map'
+                type = 'map';
             case 'LDA' % User selects Sinc.
-                type = 'lda'
+                type = 'lda';
         end
     end
 
     function runbutton_Callback(source,eventdata)
-        spears = [1 2 1 2 1 2];
-        smiles = [2 1 2 1 2 2];
-        perceived = [1.1 2.1 1.5 1.9 0.9 2];
+%         spears = [1 2 1 2 1 2];
+%         smiles = [2 1 2 1 2 2];
+%         perceived = [1.1 2.1 1.5 1.9 0.9 2];
+% display underlying distribution priors
+        if strcmpi(type,'map')
+            underlyingPrior = 0.1;
+            spears = generateSpears(underlyingPrior,10);
+            updateStatus()
+        else
+            underlyingPrior = 0.5;
+            spears = generateSpears(underlyingPrior,10);   
+        end
+        perceived = generateSignal(spears,'gaussian');   
+        mu = [mu1 mu2]; sigma = [sigma1 sigma2]; prior = [prior1 1-prior1];
+        [smiles, allParams] = makeDecisions(perceived, type, mu, sigma, prior);
         % Run spear demo
         figPos = get(hFig,'Position');
         [frames] = spearDemo(spears, smiles, perceived,figPos);
         movie(hFig,frames,1,2,[0 figPos(4)*.33 0 0]);
     end
+
     % Update slider values
     function updateMu1(source,eventdata)
         newval = get(source,'value');
-        mu1 = newval
+        mu1 = newval;
     end
     function updateSigma1(source,eventdata)
         newval = get(source,'value');
-        sigma1 = newval
+        sigma1 = newval;
     end
     function updateMu2(source,eventdata)
         newval = get(source,'value');
-        mu2 = newval
+        mu2 = newval;
     end
     function updateSigma2(source,eventdata)
         newval = get(source,'value');
-        sigma2 = newval
+        sigma2 = newval;
     end
     function updatePrior1(source,eventdata)
         newval = get(source,'value');
-        prior1 = newval
+        prior1 = newval;
     end
-
-
+    function updateStatus(source,eventdata,status)
+    end
 end
 
