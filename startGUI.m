@@ -25,20 +25,25 @@ hpopup = uicontrol('Style','popupmenu',...
     'String',{'MLE','MAP','LDA'},...
     'Units','normalized','Pos',[.75,.89,.17,.05],...
     'Callback',{@popup_menu_Callback});
-description = 'Description';
+description = {'Welcome to Smiley Spear Avoidance Training!',...
+    'You are a smiley face.  You can''t see very well. Deadly spears are approaching. Your goal is to survive.',...
+    'Actual locations of the approaching spears are in red.  Every red spear is in one of two categories: high or low. The locations these spears appear to you (on account of your poor vision) are in green.',...
+    'Based on your sensory perception (green spears), you must classify the location of the actual spears (red spears).  Fortunately, you can choose your brain''s method of interpreting sensory stimuli.',...
+    'Choose your brain''s classifier wisely: MLE, MAP, or LDA.  Each has its strengths and weaknesses.'
+    };
 hDescription = uicontrol('Style','text','String',description,...
-    'Units','normalized','Pos',[.05,.2,.57,.13]);
-status = {'Underlying Prior: ','Underlying Mu: ','Underlying Sigma: '};
-hStatus = uicontrol('Style','text','String',status,...
-    'Units','normalized','Pos',[.05,.05,.57,.13],...
-    'Callback',{@updateStatus});
+    'HorizontalAlignment','left','Units','normalized','Pos',[.05,0,.57,.33]);
+% status = ['Underlying Prior: ' 'Underlying Mu: ' 'Underlying Sigma: '];
+% hStatus = uicontrol('Style','text','String',status,...
+%     'Units','normalized','Pos',[.05,.05,.57,.05],...
+%     'Callback',{@updateStatus});
 
 % Create the panel for setting means, standard deviations, and priors
 hPanel = uipanel(gcf,'title','Parameters','units','normalized','pos',[0.67 0.1 0.33 0.7]);
 Panel.title = 'Parameter Tool';
 Panel.bordertype = 'none';
 Panel.titleposition = 'centertop';
-Panel.fontweight = 'bold';  
+Panel.fontweight = 'bold'; 
 Slider.min = -1;
 Slider.max = 4;
 Slider.value = 1.5;
@@ -58,6 +63,15 @@ sliderCallbacks = {{@updatePrior1};
     {@updateSigma1};
     {@updateMu1}};
 for i = 1:5
+    if i==1
+        Slider.min = 0;
+        Slider.max = 1;
+        Slider.value = 0.5;
+    else
+        Slider.min = -1;
+        Slider.max = 4;
+        Slider.value = 1.5;
+    end
     Panel.position = startPos{i};
     Panel.title = titleStrings{i};
     Slider.callback = sliderCallbacks{i};
