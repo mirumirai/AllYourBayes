@@ -11,35 +11,34 @@ prior1 = 50; % Percent
 
 %  Create and then hide the GUI as it is being constructed.
 hFig = figure('Visible','off','Position',[100,100,800,600]);
-
+set(hFig, 'Color', [1 1 1]);
 % Construct the components.
 hRun = uicontrol('Style','pushbutton',...
     'String','Run Simulation',...
     'Units','normalized','Pos',[.75,.025,0.17,.05],...
-    'Callback',{@runbutton_Callback});
+    'Callback',{@runbutton_Callback},'BackgroundColor', [1 1 1]);
 
 hMethodText = uicontrol('Style','text','String','Choose Method',...
-    'Units','normalized','Pos',[.76,.95,.15,.025]);
+    'Units','normalized','Pos',[.76,.95,.15,.025],'BackgroundColor', [1 1 1]);
 
 hpopup = uicontrol('Style','popupmenu',...
     'String',{'MLE','MAP','LDA'},...
     'Units','normalized','Pos',[.75,.89,.17,.05],...
-    'Callback',{@popup_menu_Callback});
+    'Callback',{@popup_menu_Callback},'BackgroundColor', [1 1 1]);
 description = {'Welcome to Smiley Spear Avoidance Training!',...
-    'You are a smiley face.  You can''t see very well. Deadly spears are approaching. Your goal is to survive.',...
+    'You are a smiley face.  You have very poor vision. Deadly spears are approaching. Your goal is to survive.',...
     'Actual locations of the approaching spears are in red.  Every red spear is in one of two categories: high or low. The locations these spears appear to you (on account of your poor vision) are in green.',...
-    'Based on your sensory perception (green spears), you must classify the location of the actual spears (red spears).  Fortunately, you can choose your brain''s method of interpreting sensory stimuli.',...
-    'Choose your brain''s classifier wisely: MLE, MAP, or LDA.  Each has its strengths and weaknesses.'
+    'Based on your sensory perception (green spears), you must classify the location of the actual spears (red spears).'
     };
 hDescription = uicontrol('Style','text','String',description,...
-    'HorizontalAlignment','left','Units','normalized','Pos',[.05,0,.57,.33]);
-% status = ['Underlying Prior: ' 'Underlying Mu: ' 'Underlying Sigma: '];
-% hStatus = uicontrol('Style','text','String',status,...
-%     'Units','normalized','Pos',[.05,.05,.57,.05],...
-%     'Callback',{@updateStatus});
+    'HorizontalAlignment','left','Units','normalized','Pos',[.05,0,.57,.33],'BackgroundColor', [1 1 1]);
+status = ['Underlying Prior(1): 0.5 ' 'Underlying Mus: 1,2 ' 'Underlying Sigmas: 0.4,0.2 '];
+hStatus = uicontrol('Style','text','String',status,...
+    'Units','normalized','Pos',[.05,.05,.57,.05],'BackgroundColor', [1 1 1]);
 
 % Create the panel for setting means, standard deviations, and priors
-hPanel = uipanel(gcf,'title','Parameters','units','normalized','pos',[0.67 0.1 0.33 0.7]);
+hPanel = uipanel(gcf,'title','Parameters','units','normalized',...
+    'pos',[0.67 0.1 0.33 0.7],'BackgroundColor',[1 1 1]);
 Panel.title = 'Parameter Tool';
 Panel.bordertype = 'none';
 Panel.titleposition = 'centertop';
@@ -47,9 +46,10 @@ Panel.fontweight = 'bold';
 Slider.min = -1;
 Slider.max = 4;
 Slider.value = 1.5;
+Slider.backgroundcolor = [1 1 1];
 [mu1,sigma1,mu2,sigma2,prior1] = deal(Slider.value);
-EditOpts = {'fontsize',10};
-LabelOpts = {'fontsize',8,'fontweight','b'};
+EditOpts = {'fontsize',10,'backgroundcolor',[1 1 1]};
+LabelOpts = {'fontsize',8,'fontweight','b','backgroundcolor',[1 1 1]};
 numFormat = '%0.2f';
 titleStrings = {'Prior 1 (%)','Sigma 2', 'Mu 2', 'Sigma 1', 'Mu 1'};
 startPos = {[0.05 0.05 0.9 0.18];
@@ -67,6 +67,10 @@ for i = 1:5
         Slider.min = 0;
         Slider.max = 1;
         Slider.value = 0.5;
+    elseif i==2 || i==4
+        Slider.min = 0;
+        Slider.max = 3;
+        Slider.value = 1.5;
     else
         Slider.min = -1;
         Slider.max = 4;
@@ -74,6 +78,7 @@ for i = 1:5
     end
     Panel.position = startPos{i};
     Panel.title = titleStrings{i};
+    Panel.backgroundcolor = [1 1 1];
     Slider.callback = sliderCallbacks{i};
     [hSlider(i),~,~] = sliderPanel(hPanel,Panel,Slider,EditOpts,LabelOpts,numFormat);
 end
@@ -91,12 +96,18 @@ set(hFig,'Visible','on')
         val = get(source, 'Value');
         % Set current data to the selected data set.
         switch str{val};
-            case 'MLE' % User selects Peaks.
+            case 'MLE' % User selects MLE.
                 type = 'mle';
-            case 'MAP' % User selects Membrane.
+                status = ['Underlying Prior(1): 0.5 ' 'Underlying Mus: 1,2 ' 'Underlying Sigmas: 0.4,0.2 '];
+                set(hStatus,'String',status)
+            case 'MAP' % User selects MAP.
                 type = 'map';
-            case 'LDA' % User selects Sinc.
+                status = ['Underlying Prior(1): 0.1 ' 'Underlying Mus: 1,2 ' 'Underlying Sigmas: 0.4,0.2 '];
+                set(hStatus,'String',status)
+            case 'LDA' % User selects LDA.
                 type = 'lda';
+                status = ['Underlying Prior(1): 0.5 ' 'Underlying Mus: 1,2 ' 'Underlying Sigmas: 0.4,0.2 '];
+                set(hStatus,'String',status)
         end
     end
 
@@ -105,18 +116,32 @@ set(hFig,'Visible','on')
 %         smiles = [2 1 2 1 2 2];
 %         perceived = [1.1 2.1 1.5 1.9 0.9 2];
 % display underlying distribution priors
+        nShort = 10; % Number of spears in movie
+        nLong = 5000; % Number of spears in long simulation
         if strcmpi(type,'map')
             underlyingPrior = 0.1;
-            spears = generateSpears(underlyingPrior,10);
-            updateStatus()
+            spears = generateSpears(underlyingPrior,nShort);
+            spearsLong = generateSpears(underlyingPrior,nLong);  
         else
             underlyingPrior = 0.5;
-            spears = generateSpears(underlyingPrior,10);   
+            spears = generateSpears(underlyingPrior,nShort);
+            spearsLong = generateSpears(underlyingPrior,nLong);   
         end
+        
+        % Short simulation for movie
         perceived = generateSignal(spears,'gaussian');   
         mu = [mu1 mu2]; sigma = [sigma1 sigma2]; prior = [prior1 1-prior1];
         [smiles, allParams] = makeDecisions(perceived, type, mu, sigma, prior);
-        % Run spear demo
+                
+        
+        % Long Simulation
+        perceivedLong = generateSignal(spearsLong,'gaussian');   
+        mu = [mu1 mu2]; sigma = [sigma1 sigma2]; prior = [prior1 1-prior1];
+        [smilesLong, allParamsLong] = makeDecisions(perceivedLong, type, mu, sigma, prior);
+        successProb = sum(smilesLong~=spearsLong)/nLong;
+        set(hStatus,'String',['Successful Dodge Probability Over ' num2str(nLong) ' trials: ' num2str(successProb) '%'])
+        
+        % Run spear movie
         figPos = get(hFig,'Position');
         [frames] = spearDemo(spears, smiles, perceived,figPos);
         movie(hFig,frames,1,2,[0 figPos(4)*.33 0 0]);

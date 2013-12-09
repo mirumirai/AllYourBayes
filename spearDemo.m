@@ -4,7 +4,8 @@ function [frames] = spearDemo(spears, smiles, perceived, figPos)
     timesteps = min(length(spears), ...
         min(length(smiles), length(perceived)));
     newPos = [0 0 figPos(3)*.67 figPos(4)*.67];
-    figure('Renderer', 'zbuffer','Position',newPos);
+    figure('Renderer', 'zbuffer','Position',newPos,'Visible','off',...
+        'Color',[1 1 1]);
     hold on;
     
     height = 3;
