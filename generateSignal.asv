@@ -8,8 +8,10 @@ function signal = generateSignal(spears,type,mu,sigma)
     % signal). Smiley has to use this signal and his assumptions to make a
     % decision.
     
-    % Signal generation distribution parameters mu and sigma are 2x1
-    % vectors. Basically determines the "blurriness" of his eyesight.
+    % Signal generation distribution parameters. Basically determines the
+    % "blurriness" of his eyesight.
+    mu1 = mu(1); sigma1 = 0.4;
+    mu2 = 2; sigma2 = 0.2;
    
     signal = zeros(1,length(spears));
     
@@ -17,9 +19,9 @@ function signal = generateSignal(spears,type,mu,sigma)
     if strcmpi(type,'gaussian')
         for i=1:length(spears)
             if spears(i) == 1
-                signal(i) = normrnd(mu(1),sigma(1));
+                signal(i) = normrnd(mu1,sigma1);
             else
-                signal(i) = normrnd(mu(2),sigma(2));
+                signal(i) = normrnd(mu2,sigma2);
             end
         end
     end

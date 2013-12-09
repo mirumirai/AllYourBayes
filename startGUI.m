@@ -106,7 +106,7 @@ set(hFig,'Visible','on')
                 set(hStatus,'String',status)
             case 'LDA' % User selects LDA.
                 type = 'lda';
-                status = ['Underlying Prior(1): 0.5 ' 'Underlying Mus: 1,2 ' 'Underlying Sigmas: 0.4,0.2 '];
+                status = ['Underlying Prior(1): 0.5 ' 'Underlying Mus: 1, 2 ' 'Underlying Sigmas: 0.3, 0.3 '];
                 set(hStatus,'String',status)
         end
     end
@@ -118,24 +118,34 @@ set(hFig,'Visible','on')
 % display underlying distribution priors
         nShort = 10; % Number of spears in movie
         nLong = 5000; % Number of spears in long simulation
-        if strcmpi(type,'map')
-            underlyingPrior = 0.1;
+        if strcmpi(type,'map')            
+            underlyingMu = [1 2]; 
+            underlyingSigma = [0.4 0.2];
+            underlyingPrior = 0.1;            
             spears = generateSpears(underlyingPrior,nShort);
             spearsLong = generateSpears(underlyingPrior,nLong);  
+        elseif strcmpi(type,'lda')
+            underlyingMu = [1 2]; 
+            underlyingSigma = [0.3 0.3];
+            underlyingPrior = 0.5;
+            spears = generateSpears(underlyingPrior,nShort);
+            spearsLong = generateSpears(underlyingPrior,nLong);   
         else
+            underlyingMu = [1 2]; 
+            underlyingSigma = [0.4 0.2];
             underlyingPrior = 0.5;
             spears = generateSpears(underlyingPrior,nShort);
             spearsLong = generateSpears(underlyingPrior,nLong);   
         end
         
         % Short simulation for movie
-        perceived = generateSignal(spears,'gaussian');   
+        perceived = generateSignal(spears,'gaussian',underlyingMu,underlyingSigma);   
         mu = [mu1 mu2]; sigma = [sigma1 sigma2]; prior = [prior1 1-prior1];
         [smiles, allParams] = makeDecisions(perceived, type, mu, sigma, prior);
                 
         
         % Long Simulation
-        perceivedLong = generateSignal(spearsLong,'gaussian');   
+        perceivedLong = generateSignal(spearsLong,'gaussian',underlyingMu,underlyingSigma);   
         mu = [mu1 mu2]; sigma = [sigma1 sigma2]; prior = [prior1 1-prior1];
         [smilesLong, allParamsLong] = makeDecisions(perceivedLong, type, mu, sigma, prior);
         successProb = sum(smilesLong~=spearsLong)/nLong;
