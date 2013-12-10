@@ -1,7 +1,6 @@
 function [likelihood,muEst,sigmaEst] = mleGaussian(data,mu,sigma)
 % Calculates the maximum likelihood estimate for Gaussian data
 % Data can be a scalar or a vector
-% Mu
     if isvector(data)
         likelihood = (1/sqrt(2*pi*sigma^2)) * ...
             exp(-((data-mu).^2)/(2*sigma^2));

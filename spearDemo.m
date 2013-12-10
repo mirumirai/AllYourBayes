@@ -1,5 +1,14 @@
 function [frames] = spearDemo(spears, smiles, perceived, figPos)
-
+    % SPEARDEMO takes precalculated simulation data and makes a movie
+    % Inputs:
+    %   spears - 1xn vector of spear positions (1 or 2)
+    %   smiles - 1xn vector of smiley face positions (1 or 2)
+    %   perceived - 1xn vector of perceived spear locations (float values)
+    %   figPos - GUI position for scaling movie to fit
+    % Outputs:
+    %   frames - the frames of the movie
+    
+    
     % Setup the timesteps / canvas / initial plot
     timesteps = min(length(spears), ...
         min(length(smiles), length(perceived)));

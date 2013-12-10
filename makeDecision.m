@@ -1,5 +1,5 @@
 function [choice, params] = makeDecision(data,type,mu,sigma,prior)
-% Chooses the more likely of two distributions
+% MAKEDECISION chooses the more likely of two distributions
 % Inputs:
 %   data - a scalar or vector of input signals
 %	types - Estimation type. Possible types include:

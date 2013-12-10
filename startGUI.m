@@ -12,7 +12,8 @@ prior1 = 50; % Percent
 %  Create and then hide the GUI as it is being constructed.
 hFig = figure('Visible','off','Position',[100,100,800,600]);
 set(hFig, 'Color', [1 1 1]);
-% Construct the components.
+
+% Construct the GUI components.
 hRun = uicontrol('Style','pushbutton',...
     'String','Run Simulation',...
     'Units','normalized','Pos',[.75,.025,0.17,.05],...
@@ -34,7 +35,7 @@ hDescription = uicontrol('Style','text','String',description,...
     'HorizontalAlignment','left','Units','normalized','Pos',[.05,0,.57,.33],'BackgroundColor', [1 1 1]);
 status = ['Underlying Prior(1): 0.5 ' 'Underlying Mus: 1,2 ' 'Underlying Sigmas: 0.4,0.2 '];
 hStatus = uicontrol('Style','text','String',status,...
-    'Units','normalized','Pos',[.05,.05,.57,.05],'BackgroundColor', [1 1 1]);
+    'Units','normalized','Pos',[.05,.05,.57,.05],'BackgroundColor', [.9 .9 .9]);
 
 % Create the panel for setting means, standard deviations, and priors
 hPanel = uipanel(gcf,'title','Parameters','units','normalized',...
@@ -112,10 +113,6 @@ set(hFig,'Visible','on')
     end
 
     function runbutton_Callback(source,eventdata)
-%         spears = [1 2 1 2 1 2];
-%         smiles = [2 1 2 1 2 2];
-%         perceived = [1.1 2.1 1.5 1.9 0.9 2];
-% display underlying distribution priors
         nShort = 10; % Number of spears in movie
         nLong = 5000; % Number of spears in long simulation
         if strcmpi(type,'map')            
